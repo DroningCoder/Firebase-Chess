@@ -1,6 +1,6 @@
 # Firebase Chess
 
-![Chess Game GIF]()
+![Chess Game GIF](https://github.com/DroningCoder/Firebase-Chess/blob/main/VideoDemonstration.gif?raw=true)
 
 An Android Multiplayer Chess game written in Kotlin. Allows users to play Chess on multiple devices while online, using Google's Cloud Firestore as the synchronizing database.
 
