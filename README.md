@@ -1,53 +1,86 @@
-# Firebase Chess
+# Firebase Chess ♟️
+
+Video demonstration of the App along with the firestore database updating its collections in real time -
 
 ![Chess Game GIF](https://github.com/DroningCoder/Firebase-Chess/blob/main/VideoDemonstration.gif?raw=true)
 
-An Android Multiplayer Chess game written in Kotlin. Allows users to play Chess on multiple devices while online, using Google's Cloud Firestore as the synchronizing database.
+An Android Multiplayer Chess game written in **Kotlin**. Users can play Chess on multiple devices while online, running Google's Cloud Firestore as the synchronizing database in the backend.
 
-Cloud Firestore is a flexible, scalable database for mobile, web, and server development from Firebase and Google Cloud. Like Firebase Realtime Database, it keeps your data in sync across client apps through realtime listeners and offers offline support for mobile and web so you can build responsive apps that work regardless of network latency or Internet connectivity. Cloud Firestore also offers seamless integration with other Firebase and Google Cloud products, including Cloud Functions.
+### About Cloud Firestore ☁️
 
-[More about Google Cloud Firestore](https://firebase.google.com/docs/firestore)
+Cloud Firestore is a flexible, scalable database for mobile, web, and server development from Firebase and Google Cloud. It keeps data in sync across client apps through real-time listeners and offers offline support for mobile and web, allowing to build responsive apps that work regardless of network latency or Internet connectivity. Cloud Firestore seamlessly integrates with other Firebase and Google Cloud products, including Cloud Functions.
 
-## Firestore Database
+[Learn more about Google Cloud Firestore](https://firebase.google.com/docs/firestore)
 
-All documents in a collection have the same fields. The database contains the following collections - 
+## Firestore Database 📚
 
-### 1. users
-A document in this collection exists for each user signed-up in the app. Contains email id, password and username set by the user. A list of strings "friends" maintains email ids of all friends of the user. A list of strings "invites" contains email ids of all users that invite the user to play a game. "gameId" is a unique id for each game played on the app. This is generated in the "selectFriend" activity. player = "player1" for player requesting a challenge; player = "player2" for player accepting the challenge.
+I have organized the database into 3 collections, all documents within a collection have the same fields. The collections include:
 
-### 2. games
-A document in this collection exists for each game initialised in the app. Fields black and white denote which player (player1/player2) plays as black and white. Field gameId contains firestore-generated unique id for the document. timer1 and timer2 contain time in milliseconds for each user on basis of the game mode selected by the player that generated the challenge. increment contains added time to each player after their move (for example 10,000ms if game mode was 15 | 10). fromPos and toPos are arrays of numbers containing initial and final coordinates (on an 8 x 8 chessboard) of a piece moved by a player. drawResignDocumentId is the firestore-generated ID for a document in the collection "drawResignDocument", which is explained further in this section. blackCheckmate and whiteCheckmate are flags used for purposes of terminating a game. turn stores player1/player2 denoting turn of the user who is to play a move.
+### 1. Users 👤
+This collection contains a document for each user who signs up in the app. Each document includes:
+- **Email ID**
+- **Password**
+- **Username**
+- **Friends**: A list of strings storing the email IDs of all friends.
+- **Invites**: A list of strings containing email IDs of users who invite the user to play a game.
+- **gameId**: A unique ID for each game played on the app, generated in the `selectFriend` activity. 
+- **player**: "player1" for the player requesting a challenge; "player2" for the player accepting the challenge.
 
-### 3. draw_resign
-Contains two variables draw and resign to control cases for drawing and resigning from games.
-## Activities
+### 2. Games ♟️
+This collection includes a document for each game initialized in the app, with the following fields:
+- **Black/White**: Denotes which player (player1/player2) plays as black and white.
+- **gameId**: Randomly generated unique ID for the document.
+- **timer1/timer2**: Contains time in milliseconds for each user based on the selected game mode.
+- **increment**: Added time to each player after their move (e.g., 10,000 ms if game mode was 15 | 10).
+- **fromPos/toPos**: Arrays of numbers containing initial and final coordinates (on an 8 x 8 chessboard) of a piece moved by a player.
+- **drawResignDocumentId**: Firestore-generated ID for a document in the `draw_resign` collection.
+- **blackCheckmate/whiteCheckmate**: Flags used to indicate game termination.
+- **turn**: Stores player1/player2, indicating whose turn it is to play.
 
-Below is an overview and functionality presented by each of the activities in the app.
+### 3. Draw/Resign 🏳️
+This collection contains two variables, `draw` and `resign`, to manage scenarios for drawing or resigning from games.
 
-### 1. sign_up
+## Activities 📱
 
-Creates a new document in collection *users* with credentials set by the user.
+An overview of the functionalities offered by each activity in the app:
 
-### 2. login
+### 1. Sign Up 📝
+Creates a new document in the `users` collection with the credentials set by the user.
 
-Refers collection *users* to check if email ID matches with its corresponding password. Home Screen is launched if it does.
+### 2. Login 🔑
+Checks the `users` collection to verify the email ID and corresponding password. Launches the activity `HomeScreen` upon a successful match.
 
-### 3. HomeScreen
+### 3. Home Screen 🏠
+The main menu of the game allows users to select from various game modes: **Rapid, Blitz, and Bullet**. It also links to the `selectFriend` and `Profile` activities.
 
-Main menu of the game, contains various levels of onClickListeners, allows user to select from the game modes Rapid, Blitz and Bullet. Launches activities selectFriend and Profile.
+### 4. Select Friend 👥
+Displays a `listView` with email IDs of the user’s friends. The `Add Friend` button allows users to add another email ID to their friends list. The `setOnItemClickListener` creates a unique document for the game in the `draw_resign` collection and initializes a new document for the game in the `games` collection, launching the `Game` activity.
 
-### 4. selectFriend
+### 5. Invitations 📧
+Utilizes a snapshot listener to add email IDs of players who have sent a challenge in real-time. Launches the `Game` activity.
 
-Contains a listView with email IDs of friends of the user as the list items. Add friend button adds email id of another user to the friends list of the user. setOnItemClickListener of listView creates a unique document for the game in the collection draw_resign. It also creates a new document for the game in collection games and proceeds to launch the activity Game.
+### 6. Game 🎮
+Handles all the mechanics of moving pieces along with their drawables on the board. onClickListeners  for each of the 64 cells on the board display movable positions of a piece, and after a player makes a move, the initial and final coordinates are updated in the shared `games` document. Snapshot listeners (one listening to the `games` document, the other to the `draw_resign` document) monitor real-time changes and control the game flow based on the current turn. The timer logic is maintained throughout the game duration, managing start and stop actions. When the game ends, both players are directed back to the activity `HomeScreen`.
 
-### 5. Invitations
+### 7. Profile 👤
+Allows users to edit their account username or password, contingent on a password verification check for authenticity.
 
-Contains a snapshotListener to add in real-time email IDs of players that have sent a challenge. Launches activity Game.
+## How to Clone this Repository
 
-### 6. Game
+1. **Copy the Repository URL**:
+   - On the top of this page, click on the green **Code** button and copy the HTTPS or SSH URL.
 
-Contains all the mechanics of moving pieces along with their drawables on the board. onClickListeners are defined on various levels to show movable positions of a piece and to move to a particular position on the board. After a player makes a move, initial and final coordinates of the piece moved are updated in the common games document. A snapshotListener listens to these changes in real-time and controls the flow of execution based on the variable turn. Another snapshotListener listens in real-time draw requests/resign case and controls the termination of the game. Timer logic is maintained throughout the duration of the game, its starting and stopping is controlled by the snapshotListener. When a game ends, both players are directed back to the activity HomeScreen.
+2. **Clone the Repository**:
+   - Navigate to the directory in which you want to clone the app.
+   - Use the `git clone` command followed by the copied URL.
 
-### 7. Profile
+3. **Navigate into the Cloned Repository**:
+   - After cloning, navigate into the newly created directory using `cd` command.
 
-Allows a user to edit their account username or password, provided they pass their password check to ensure authenticity.
+4. **Open the Project in Android Studio**:
+   - Open Android Studio, click "Open an existing Android Studio project," and select the cloned repository directory.
+
+Feel free to explore the code and contribute to the project.
+
+---
+⚠️ Code of the piece move logic is functional but contains a few bugs, I'm working to fix the bugs. If you have any suggestions or issues, please open an issue or submit a pull request.
